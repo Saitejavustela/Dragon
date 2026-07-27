@@ -22,15 +22,16 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: './ui/package-lock.json' # Adjust if lockfile is elsewhere
+          cache-dependency-path: './ui/package-lock.json'
 
       # Step 3: Install Vercel CLI
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      # Step 4: Install UI Dependencies (Fixes missing react-scripts)
+      # Step 4: Install UI Dependencies (Runs inside ./ui)
       - name: Install Dependencies
         run: npm ci
+        working-directory: ./ui
 
       # Step 5: Pull Vercel Environment Information
       - name: Pull Vercel Environment Information
