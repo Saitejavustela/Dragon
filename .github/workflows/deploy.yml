@@ -1,55 +1,49 @@
-name: Deploy to Vercel
+name: Deploy UI to Vercel
 
 on:
   push:
     branches:
       - main
-
-permissions:
-  contents: read
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js 22
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: 'npm'
-          cache-dependency-path: 'ui/package-lock.json'
+          cache-dependency-path: './ui/package-lock.json'
 
-      # Step 3: Install Vercel CLI
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      # Step 4: Install UI Dependencies
-      - name: Install Dependencies
-        run: npm ci
-        working-directory: ./ui
-
-      # Step 5: Pull Vercel Environment Information
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+        working-directory: ./ui
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # Step 6: Build Project Artifacts
       - name: Build Project Artifacts
-        run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+        working-directory: ./ui
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # Step 7: Deploy Artifacts to Vercel
-      - name: Deploy Framework Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
+      - name: Deploy Project Artifacts to Vercel
+        working-directory: ./ui
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
