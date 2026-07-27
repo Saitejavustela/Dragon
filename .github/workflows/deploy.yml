@@ -3,40 +3,52 @@ name: Deploy to Vercel
 on:
   push:
     branches:
-      - main # Change this to your production branch
+      - main
 
 permissions:
   contents: read
-  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out code from GitHub
+      # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Install Vercel CLI
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: './ui/package-lock.json' # Adjust if lockfile is elsewhere
+
+      # Step 3: Install Vercel CLI
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      # Step 3: Pull Vercel Environment Information
+      # Step 4: Install UI Dependencies (Fixes missing react-scripts)
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step 5: Pull Vercel Environment Information
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # Step 4: Build Project Artifacts
+      # Step 6: Build Project Artifacts
       - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # Step 5: Deploy Artifacts to Vercel
+      # Step 7: Deploy Artifacts to Vercel
       - name: Deploy Framework Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
