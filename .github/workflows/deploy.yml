@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js (Updated to Node 22 & fixed cache path)
+      # Step 2: Set up Node.js 22
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
