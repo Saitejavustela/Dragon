@@ -1,7 +1,7 @@
 import Dashboard from './components/Dashboard';
 import Image from './components/Image';
 import Report from './components/Report';
-import { BrowserRouter as Router, Routes, Route,Link} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 export default function App() {
   return (
     <Router>
